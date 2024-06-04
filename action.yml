@@ -1,0 +1,33 @@
+name: vroom
+description: 🫥 Ephimeral environments preview deploy
+
+inputs:
+  host:
+    description: 'The hostname or IP address of the server'
+    required: true
+    default: ${{ secrets.VROOM_HOST }}
+  user:
+    description: 'The username used to connect to the server'
+    required: true
+    default: ${{ secrets.VROOM_USER }}
+  key:
+    description: 'The SSH private key used for authentication'
+    required: true
+    default: ${{ secrets.VROOM_KEY }}
+  port:
+    description: 'The SSH port of the server'
+    required: true
+    default: ${{ secrets.VROOM_PORT }}
+
+runs:
+  using: composite
+  steps:
+    - uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ inputs.host }}
+        username: ${{ inputs.user }}
+        key: ${{ inputs.key }}
+        port: ${{ inputs.port }}
+        script: |
+          nohup ./vroom ${{ github.repository }} ${{ github.event.number }} > nohup.out 2> nohup.err < /dev/null &
+
